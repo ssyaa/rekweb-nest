@@ -1,20 +1,41 @@
-// pengajuan.controller.ts
-import { Controller, Post, Body, Req, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { PengajuanService } from './pengajuan.service';
-import { AuthGuard } from '@nestjs/passport';
-import { CreatePengajuanDto } from './dto/pengajuan.dto';
+import { CreatePengajuanDto } from './dto/create-pengajuan.dto';
+import { UpdatePengajuanDto } from './dto/update-pengajuan.dto';
 
 @Controller('pengajuan')
 export class PengajuanController {
-    constructor(private readonly pengajuanService: PengajuanService) {}
+    constructor(private pengajuanService: PengajuanService) {}
 
-    @UseGuards(AuthGuard('jwt'))
-    @Post()
-    async createPengajuan(
-        @Body(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })) dto: CreatePengajuanDto,
-        @Req() req
-    ) {
-        const userId = req.user.userId;
-        return this.pengajuanService.createPengajuan(userId, dto);
+    @Get()
+    async findAll() {
+        return this.pengajuanService.findAll();
+    }
+
+    @Get('statistik')
+    async getStatistik() {
+        return this.pengajuanService.getStatistik();
+    }
+
+    @Get(':id')
+    async findOne(@Param('id') id: string) {
+        return this.pengajuanService.findOne(id);
+    }
+
+    // Buat pengajuan baru dengan nim mahasiswa sebagai param
+    @Post(':nim')
+    async create(@Param('nim') nim: string, @Body() dto: CreatePengajuanDto) {
+        return this.pengajuanService.create(nim, dto);
+    }
+
+    // Update status dan alasan penolakan pengajuan
+    @Put(':id/status')
+    async updateStatus(@Param('id') id: string, @Body() dto: UpdatePengajuanDto) {
+        return this.pengajuanService.updateStatus(id, dto);
+    }
+
+    @Delete(':id')
+    async remove(@Param('id') id: string) {
+        return this.pengajuanService.remove(id);
     }
 }
