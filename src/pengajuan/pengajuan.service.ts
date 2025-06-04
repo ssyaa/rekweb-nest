@@ -24,6 +24,27 @@ export class PengajuanService {
         return pengajuan;
     }
 
+    async findByNama(nama: string) {
+        return this.prisma.pengajuanSidang.findMany({
+        where: {
+            mahasiswa: {
+            nama: {
+                contains: nama,
+            },
+            },
+        },
+        include: {
+            mahasiswa: true,
+            jadwalSidang: {
+            include: {
+                dosenPenguji1: true,
+                dosenPenguji2: true,
+            },
+            },
+        },
+        });
+    }
+
     async create(nim: string, dto: CreatePengajuanDto) {
         // cek mahasiswa
         const mahasiswa = await this.prisma.mahasiswa.findUnique({ where: { nim } });
@@ -52,6 +73,18 @@ export class PengajuanService {
         },
         });
     }
+
+    async getStatus(id: string) {
+        const pengajuan = await this.prisma.pengajuanSidang.findUnique({
+            where: { id },
+            select: { status: true }, // hanya ambil status saja
+        });
+        if (!pengajuan) {
+            throw new NotFoundException(`Pengajuan dengan id ${id} tidak ditemukan`);
+        }
+        return pengajuan.status;
+    }
+
 
     async remove(id: string) {
         await this.findOne(id);

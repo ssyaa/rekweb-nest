@@ -8,4 +8,16 @@ export class CreatePengajuanDto {
     @IsUrl()
     @IsNotEmpty()
     berkasUrl: string;
+
+    @IsString()
+    @IsNotEmpty()
+    userId: string;
+
+    @IsString()
+    @IsNotEmpty()
+    nim: string;
+
+    @IsString()
+    @IsNotEmpty()
+    nama: string;
 }
