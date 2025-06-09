@@ -43,7 +43,7 @@ model Thesis_submission {
   student           Student           @relation(fields: [student_id], references: [id])
   thesis_schedule   Thesis_schedule?
 
-  @@index([student_id])
+  @@index([student_id]) //search_fitur(soon)
 }
 
 model Thesis_schedule {
@@ -55,14 +55,13 @@ model Thesis_schedule {
   examiner_2_id     String
   created_at        DateTime              @default(now())
   updated_at        DateTime              @updatedAt
-
   submission        Thesis_submission     @relation(fields: [submission_id], references: [id])
   examiner_1        Examiner              @relation("examiner_1", fields: [examiner_1_id], references: [id])
   examiner_2        Examiner              @relation("examiner_2", fields: [examiner_2_id], references: [id])
 
-  @@index([submission_id])
-  @@index([examiner_1_id])
-  @@index([examiner_2_id])
+  @@index([submission_id]) //search_fitur(soon)
+  @@index([examiner_1_id]) //search_fitur(soon)
+  @@index([examiner_2_id]) //search_fitur(soon)
 }
 
 model Examiner {

@@ -11,40 +11,40 @@ export class AuthService {
     ) {}
 
     async register(email: string, password: string, role: 'ADMIN' | 'MAHASISWA' = 'MAHASISWA') {
-        // Cek apakah user sudah ada
-        const userExist = await this.prisma.user.findUnique({ where: { email } });
-        if (userExist) throw new ConflictException('Email sudah digunakan');
+        // Cek apakah User sudah ada
+        const UserExist = await this.prisma.user.findUnique({ where: { email } });
+        if (UserExist) throw new ConflictException('Email sudah digunakan');
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await this.prisma.user.create({
+        const User = await this.prisma.user.create({
         data: {
             email,
             password: hashedPassword,
             role,
         },
         });
-        return { id: user.id, email: user.email, role: user.role };
+        return { id: User.id, email: User.email, role: User.role };
     }
 
     async validateUser(email: string, password: string) {
-        const user = await this.prisma.user.findUnique({ where: { email } });
-        if (!user) throw new UnauthorizedException('Email atau password salah');
+        const User = await this.prisma.user.findUnique({ where: { email } });
+        if (!User) throw new UnauthorizedException('Email atau password salah');
 
-        const validPassword = await bcrypt.compare(password, user.password);
+        const validPassword = await bcrypt.compare(password, User.password);
         if (!validPassword) throw new UnauthorizedException('Email atau password salah');
 
-        return user;
+        return User;
     }
 
     async login(email: string, password: string) {
-        const user = await this.validateUser(email, password);
-        const payload = { sub: user.id, email: user.email, role: user.role };
+        const User = await this.validateUser(email, password);
+        const payload = { sub: User.id, email: User.email, role: User.role };
         return {
         access_token: this.jwtService.sign(payload),
-        user: {
-            id: user.id,
-            email: user.email,
-            role: user.role,
+        User: {
+            id: User.id,
+            email: User.email,
+            role: User.role,
         },
         };
     }

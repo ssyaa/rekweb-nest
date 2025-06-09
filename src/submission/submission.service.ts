@@ -46,9 +46,9 @@ export class Submission_service {
     }
 
     async create(nim: string, dto: Create_submission_dto) {
-        // cek student
-        const student = await this.prisma.student.findUnique({ where: { nim } });
-        if (!student) {
+        // cek Student
+        const Student = await this.prisma.student.findUnique({ where: { nim } });
+        if (!Student) {
         throw new NotFoundException('Mahasiswa tidak ditemukan');
         }
 

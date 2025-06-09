@@ -11,11 +11,11 @@ export class Student_service {
     }
 
     async findOne(nim: string) {
-        const student = await this.prisma.student.findUnique({ where: { nim } });
-        if (!student) {
+        const Student = await this.prisma.student.findUnique({ where: { nim } });
+        if (!Student) {
         throw new NotFoundException(`Mahasiswa dengan NIM ${nim} tidak ditemukan`);
         }
-        return student;
+        return Student;
     }
 
     async create(dto: Create_student_dto) {

@@ -13,7 +13,7 @@ export class AuthController {
         @Body('password') password: string,
         @Res({ passthrough: true }) res: Response,
     ) {
-        const { access_token, user } = await this.authService.login(email, password);
+        const { access_token, User } = await this.authService.login(email, password);
 
         // Set cookie di sini
         res.cookie('token', access_token, {
@@ -22,7 +22,7 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24, // 1 hari
         });
 
-        return { message: 'Login berhasil', user };
+        return { message: 'Login berhasil', User };
     }
 
     @Post('logout')

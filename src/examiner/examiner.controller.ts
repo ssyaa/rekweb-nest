@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { Examiner_service } from './examiner.service';
-import { Create_examiner_dto } from './dto/create-examiner.dto';
+import { Create_examiner_dto } from './dto/create_examiner.dto';
 
 @Controller('Examiner_controller')
 export class Examiner_controller {

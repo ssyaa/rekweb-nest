@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Create_examiner_dto } from './dto/create-examiner.dto';
+import { Create_examiner_dto } from './dto/create_examiner.dto';
 
 @Injectable()
 export class Examiner_service {
@@ -11,11 +11,11 @@ export class Examiner_service {
     }
 
     async findOne(id: string) {
-        const examiner = await this.prisma.examiner.findUnique({ where: { id } });
-        if (!examiner) {
+        const Examiner = await this.prisma.examiner.findUnique({ where: { id } });
+        if (!Examiner) {
         throw new NotFoundException(`Dosen dengan ID ${id} tidak ditemukan`);
         }
-        return examiner;
+        return Examiner;
     }
 
     async create(dto: Create_examiner_dto) {
