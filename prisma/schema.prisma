@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,64 +8,74 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  password  String
-  role      Role       @default(MAHASISWA)
-  mahasiswa Mahasiswa?
+  id          String     @id @default(uuid())
+  email       String     @unique
+  password    String
+  role        Role       @default(MAHASISWA)
+  student     Student?
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
 }
 
-model Mahasiswa {
-  nim             String             @id
-  nama            String
-  email           String? 
-  prodi           String?
-  userId          String?            @unique
-  user            User?              @relation(fields: [userId], references: [id])
-  pengajuanSidang PengajuanSidang[]
+model Student {
+  id                      String             @id @default(uuid())
+  nim                     String             @unique
+  name                    String
+  email                   String?
+  study_program           String?
+  user_id                 String?            @unique
+  user                    User?              @relation(fields: [user_id], references: [id])
+  thesis_submission       Thesis_submission[]
+
+  created_at              DateTime           @default(now())
+  updated_at              DateTime           @updatedAt
 }
 
-model PengajuanSidang {
-  id              String          @id @default(uuid())
-  mahasiswaId     String
-  judulSkripsi    String
-  berkasUrl       String
-  status          StatusPengajuan @default(MENUNGGU)
-  alasanPenolakan String?
-  createdAt       DateTime        @default(now())
-  mahasiswa       Mahasiswa       @relation(fields: [mahasiswaId], references: [nim])
-  jadwalSidang    JadwalSidang?
+model Thesis_submission {
+  id                String            @id @default(uuid())
+  student_id        String
+  thesis_title      String
+  file_url          String
+  status            Submission_status @default(MENUNGGU)
+  reason_rejected   String?
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  student           Student           @relation(fields: [student_id], references: [id])
+  thesis_schedule   Thesis_schedule?
 
-  @@index([mahasiswaId])
+  @@index([student_id])
 }
 
-model JadwalSidang {
-  id              String   @id @default(uuid())
-  pengajuanId     String   @unique
-  tanggal         DateTime
-  waktu           String // atau gunakan DateTime jika gabungkan tanggal & waktu
-  dosenPenguji1Id String
-  dosenPenguji2Id String
+model Thesis_schedule {
+  id                String                @id @default(uuid())
+  submission_id     String                @unique
+  date              DateTime
+  time              String
+  examiner_1_id     String
+  examiner_2_id     String
+  created_at        DateTime              @default(now())
+  updated_at        DateTime              @updatedAt
 
-  pengajuan     PengajuanSidang @relation(fields: [pengajuanId], references: [id])
-  dosenPenguji1 Dosen           @relation("Penguji1", fields: [dosenPenguji1Id], references: [id])
-  dosenPenguji2 Dosen           @relation("Penguji2", fields: [dosenPenguji2Id], references: [id])
+  submission        Thesis_submission     @relation(fields: [submission_id], references: [id])
+  examiner_1        Examiner              @relation("examiner_1", fields: [examiner_1_id], references: [id])
+  examiner_2        Examiner              @relation("examiner_2", fields: [examiner_2_id], references: [id])
 
-  @@index([pengajuanId])
-  @@index([dosenPenguji1Id])
-  @@index([dosenPenguji2Id])
+  @@index([submission_id])
+  @@index([examiner_1_id])
+  @@index([examiner_2_id])
 }
 
-model Dosen {
-  id    String  @id @default(uuid())
-  nama  String
-  email String?
-
-  jadwalSebagaiPenguji1 JadwalSidang[] @relation("Penguji1")
-  jadwalSebagaiPenguji2 JadwalSidang[] @relation("Penguji2")
+model Examiner {
+  id                      String            @id @default(uuid())
+  name                    String
+  email                   String?
+  created_at              DateTime          @default(now())
+  updated_at              DateTime          @updatedAt
+  schedule_as_examiner_1  Thesis_schedule[] @relation("examiner_1")
+  schedule_as_examiner_2  Thesis_schedule[] @relation("examiner_2")
 }
 
-enum StatusPengajuan {
+enum Submission_status {
   MENUNGGU
   DISETUJUI
   DITOLAK

@@ -1,32 +1,33 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+// auth.controller.ts
+import { Controller, Post, Body, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-
-class RegisterDto {
-    email: string;
-    password: string;
-    role?: 'ADMIN' | 'MAHASISWA';
-}
-
-class LoginDto {
-    email: string;
-    password: string;
-}
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
-    @Post('register')
-    async register(@Body() dto: RegisterDto) {
-        return this.authService.register(dto.email, dto.password, dto.role);
-    }
-
-    @HttpCode(HttpStatus.OK)
     @Post('login')
-    async login(@Body() dto: LoginDto) {
-        return this.authService.login(dto.email, dto.password);
+    async login(
+        @Body('email') email: string,
+        @Body('password') password: string,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const { access_token, user } = await this.authService.login(email, password);
+
+        // Set cookie di sini
+        res.cookie('token', access_token, {
+        httpOnly: true,
+        secure: false, // Ganti ke true di production (HTTPS)
+        maxAge: 1000 * 60 * 60 * 24, // 1 hari
+        });
+
+        return { message: 'Login berhasil', user };
     }
 
-  // Logout biasanya hanya di sisi client dengan menghapus token,
-  // tapi bisa buat endpoint dummy untuk logout jika perlu.
+    @Post('logout')
+    logout(@Res({ passthrough: true }) res: Response) {
+        res.clearCookie('token');
+        return { message: 'Logout berhasil' };
+    }
 }
